@@ -1,12 +1,24 @@
 import React, { useState } from "react";
 import { Button, FloatingLabel, Form, Modal } from "react-bootstrap";
+import { postCreateUser } from "../services/userService";
+import { toast } from "react-toastify";
 
-const ModalAddNew = ({ show, handleClose }) => {
+const ModalAddNew = ({ show, handleClose, handleUpdateTable }) => {
   const [name, setName] = useState("");
   const [job, setJob] = useState("");
 
-  const handleSubmit = () => {
-    console.log(`>>> job: ${job} , name: ${name}`);
+  const handleCreateUser = async() => {
+    let res = await postCreateUser(name, job)
+    console.log(">>>check res", res)
+    if(res.data && res.data.id){
+      handleClose();
+      setName("");
+      setJob("");
+      toast.success("A user is created succeed!!!")
+      handleUpdateTable({id: res.data.id, first_name: name})
+    }else {
+      toast.error("An error occurred while creating")
+    }
   };
   return (
     <div>
@@ -43,8 +55,7 @@ const ModalAddNew = ({ show, handleClose }) => {
           <Button
             variant="primary"
             onClick={() => {
-              handleClose();
-              handleSubmit();
+              handleCreateUser();
             }}
           >
             Save Changes
